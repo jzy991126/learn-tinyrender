@@ -1,0 +1,11 @@
+[
+{
+  "directory": "D:\\Code\\softrender\\trender",
+  "arguments": ["C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/Iinclude", "/DNDEBUG", "/Fobuild\\.objs\\trender\\windows\\x64\\release\\src\\main.cpp.obj", "src\\main.cpp"],
+  "file": "src\\main.cpp"
+},
+{
+  "directory": "D:\\Code\\softrender\\trender",
+  "arguments": ["C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/Iinclude", "/DNDEBUG", "/Fobuild\\.objs\\trender\\windows\\x64\\release\\src\\tgaimage.cpp.obj", "src\\tgaimage.cpp"],
+  "file": "src\\tgaimage.cpp"
+}]

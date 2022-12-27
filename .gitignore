@@ -1,0 +1,15 @@
+# Xmake cache
+.xmake/
+build/
+obj/
+.cache/
+.vscode/
+build/
+objs/
+
+output.tga
+
+# MacOS Cache
+.DS_Store
+
+
