@@ -11,12 +11,12 @@ const TGAColor red = TGAColor(255, 0, 0, 255);
 const int width = 800;
 const int height = 800;
 
-struct Ivec2 {
-  Ivec2() = default;
-  Ivec2(int x, int y) : x(x), y(y) {}
-  int x, y;
-  Ivec2 operator-(const Ivec2 &b) const { return Ivec2{x - b.x, y - b.y}; }
-};
+// struct Ivec2 {
+//   Ivec2() = default;
+//   Ivec2(int x, int y) : x(x), y(y) {}
+//   int x, y;
+//   Ivec2 operator-(const Ivec2 &b) const { return Ivec2{x - b.x, y - b.y}; }
+// };
 
 Vec3f barycentric(const Vec3f &a, const Vec3f &b, const Vec3f &c,
                   const Vec3f &p) {
@@ -31,60 +31,60 @@ Vec3f barycentric(const Vec3f &a, const Vec3f &b, const Vec3f &c,
   }
 }
 
-void line(Ivec2 start, Ivec2 end, TGAImage &image, const TGAColor &color) {
+// void line(Ivec2 start, Ivec2 end, TGAImage &image, const TGAColor &color) {
 
-  Ivec2 vec = end - start;
-  bool change = false;
+//   Ivec2 vec = end - start;
+//   bool change = false;
 
-  if (abs(vec.y) > abs(vec.x)) {
-    std::swap(start.x, start.y);
-    std::swap(end.x, end.y);
-    change = true;
-  }
-  if (start.x > end.x)
-    std::swap(start, end);
-  vec = end - start;
-  int flag = vec.y > 0 ? 1 : -1;
+//   if (abs(vec.y) > abs(vec.x)) {
+//     std::swap(start.x, start.y);
+//     std::swap(end.x, end.y);
+//     change = true;
+//   }
+//   if (start.x > end.x)
+//     std::swap(start, end);
+//   vec = end - start;
+//   int flag = vec.y > 0 ? 1 : -1;
 
-  int dx = vec.x, dy = vec.y;
-  int error = abs(dy) * 2;
-  int y = start.y;
-  int sume = 0;
-  for (int x = start.x; x <= end.x; x++) {
-    if (change) {
-      image.set(y, x, color);
-    } else {
-      image.set(x, y, color);
-    }
-    sume += error;
-    if (sume > dx) {
-      y += flag;
-      sume -= 2 * dx;
-    }
-  }
-}
+//   int dx = vec.x, dy = vec.y;
+//   int error = abs(dy) * 2;
+//   int y = start.y;
+//   int sume = 0;
+//   for (int x = start.x; x <= end.x; x++) {
+//     if (change) {
+//       image.set(y, x, color);
+//     } else {
+//       image.set(x, y, color);
+//     }
+//     sume += error;
+//     if (sume > dx) {
+//       y += flag;
+//       sume -= 2 * dx;
+//     }
+//   }
+// }
 
-void mtriangle(Ivec2 &a, Ivec2 &b, Ivec2 &c, TGAImage &image,
-               const TGAColor &color) {
-  if (a.y > b.y)
-    std::swap(a, b);
-  if (a.y > c.y)
-    std::swap(a, c);
-  if (b.y > c.y)
-    std::swap(b, c);
-  Ivec2 vec1 = c - a, vec2 = b - a, vec3 = c - b;
-  float k1 = (float)vec1.x / (vec1.y), k2 = (float)vec2.x / (vec2.y),
-        k3 = (float)vec3.x / (vec3.y);
-  float sx = a.x, ex = a.x;
-  for (int y = a.y; y < b.y; y++) {
-    line({int(sx), y}, {int(ex), y}, image, color);
-    sx += k1, ex += k2;
-  }
-  for (int y = b.y; y < c.y; y++) {
-    line({int(sx), y}, {int(ex), y}, image, color);
-    sx += k1, ex += k3;
-  }
-}
+// void mtriangle(Ivec2 &a, Ivec2 &b, Ivec2 &c, TGAImage &image,
+//                const TGAColor &color) {
+//   if (a.y > b.y)
+//     std::swap(a, b);
+//   if (a.y > c.y)
+//     std::swap(a, c);
+//   if (b.y > c.y)
+//     std::swap(b, c);
+//   Ivec2 vec1 = c - a, vec2 = b - a, vec3 = c - b;
+//   float k1 = (float)vec1.x / (vec1.y), k2 = (float)vec2.x / (vec2.y),
+//         k3 = (float)vec3.x / (vec3.y);
+//   float sx = a.x, ex = a.x;
+//   for (int y = a.y; y < b.y; y++) {
+//     line({int(sx), y}, {int(ex), y}, image, color);
+//     sx += k1, ex += k2;
+//   }
+//   for (int y = b.y; y < c.y; y++) {
+//     line({int(sx), y}, {int(ex), y}, image, color);
+//     sx += k1, ex += k3;
+//   }
+// }
 void triangle(const Vec3f &a, const Vec3f &b, const Vec3f &c, TGAImage &image,
               float *zbuffer, Vec2f uva, Vec2f uvb, Vec2f uvc,
               const TGAImage &tex, float intense) {
@@ -166,7 +166,6 @@ int main(int argc, char **argv) {
     }
   }
 
-  Ivec2 a{10, 10}, b{100, 30}, c{190, 160};
   // triangle(a, b, c, image, white);
   image.write_tga_file("output.tga");
   return 0;

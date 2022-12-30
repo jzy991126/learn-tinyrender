@@ -25,7 +25,7 @@ Model::Model(const std::string filename) {
     } else if (!line.compare(0, 3, "vt ")) {
       iss >> trash >> trash;
       vec2 uv;
-      iss >> uv.u >> uv.v;
+      iss >> uv.x >> uv.y;
       tex_coord.push_back({uv.x, 1 - uv.y});
     } else if (!line.compare(0, 2, "f ")) {
       int f, t, n;
