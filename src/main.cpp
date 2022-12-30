@@ -10,6 +10,7 @@ const TGAColor red = TGAColor(255, 0, 0, 255);
 
 const int width = 800;
 const int height = 800;
+const int depth = 255;
 
 // struct Ivec2 {
 //   Ivec2() = default;
@@ -116,13 +117,38 @@ void triangle(const Vec3f &a, const Vec3f &b, const Vec3f &c, TGAImage &image,
     }
   }
 }
+
+Matrix v2m(Vec3f v) {
+  Matrix m(4, 1);
+  m[0][0] = v.x;
+  m[1][0] = v.y;
+  m[2][0] = v.z;
+  m[3][0] = 1.f;
+  return m;
+}
+Vec3f m2v(Matrix m) {
+  return Vec3f(m[0][0] / m[3][0], m[1][0] / m[3][0], m[2][0] / m[3][0]);
+}
+
+Matrix viewport(int x, int y, int w, int h) {
+  Matrix m = Matrix::identity(4);
+  m[0][3] = x + w / 2.f;
+  m[1][3] = y + h / 2.f;
+  m[2][3] = depth / 2.f;
+
+  m[0][0] = w / 2.f;
+  m[1][1] = h / 2.f;
+  m[2][2] = depth / 2.f;
+  return m;
+}
+
 int main(int argc, char **argv) {
 
   Model *model;
   if (2 == argc) {
     model = new Model(argv[1]);
   } else {
-    model = new Model("objs/african_head.obj");
+    model = new Model("obj/african_head/african_head.obj");
   }
   TGAImage image(width, height, TGAImage::RGB);
   TGAImage texture;
@@ -141,6 +167,8 @@ int main(int argc, char **argv) {
   //     }
   //   }
   float *zbuffer = new float[width * height];
+  Vec3f camera(0, 0, 3);
+
   std::fill(zbuffer, zbuffer + width * height,
             -std::numeric_limits<float>::max());
   Vec3f light_dir(0, 0, -1);
@@ -148,13 +176,18 @@ int main(int argc, char **argv) {
     Vec3f screen_coords[3];
     Vec3f world_coords[3];
     Vec2f uvs[3];
+    Matrix Projection = Matrix::identity(4);
+    Matrix ViewPort =
+        viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4);
+    Projection[3][2] = -1.f / camera.z;
     for (int j = 0; j < 3; j++) {
       Vec3f world_coord = model->vert(i, j);
       world_coords[j] = world_coord;
       uvs[j] = model->uv(i, j);
-      screen_coords[j] =
-          Vec3f((world_coord.x + 1.) * width / 2.,
-                (world_coord.y + 1.) * height / 2., world_coord.z);
+      //   screen_coords[j] =
+      //       Vec3f((world_coord.x + 1.) * width / 2.,
+      //             (world_coord.y + 1.) * height / 2., world_coord.z);
+      screen_coords[j] = m2v(ViewPort * Projection * v2m(world_coord));
     }
     Vec3f normal = (world_coords[2] - world_coords[0]) ^
                    (world_coords[1] - world_coords[0]);
