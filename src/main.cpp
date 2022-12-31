@@ -187,6 +187,7 @@ int main(int argc, char **argv) {
       //   screen_coords[j] =
       //       Vec3f((world_coord.x + 1.) * width / 2.,
       //             (world_coord.y + 1.) * height / 2., world_coord.z);
+      auto s = ViewPort * Projection;
       screen_coords[j] = m2v(ViewPort * Projection * v2m(world_coord));
     }
     Vec3f normal = (world_coords[2] - world_coords[0]) ^
