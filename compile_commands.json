@@ -1,11 +1,26 @@
 [
 {
   "directory": "D:\\Code\\softrender\\trender",
-  "arguments": ["C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/Iinclude", "/DNDEBUG", "/Fobuild\\.objs\\trender\\windows\\x64\\release\\src\\main.cpp.obj", "src\\main.cpp"],
+  "arguments": ["C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdd:\\Code\\softrender\\trender\\build\\windows\\x64\\debug\\compile.trender.pdb", "/Od", "/Iinclude", "/Fod:\\Code\\softrender\\trender\\build\\.objs\\trender\\windows\\x64\\debug\\src\\geometry.cpp.obj", "src\\geometry.cpp"],
+  "file": "src\\geometry.cpp"
+},
+{
+  "directory": "D:\\Code\\softrender\\trender",
+  "arguments": ["C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdd:\\Code\\softrender\\trender\\build\\windows\\x64\\debug\\compile.trender.pdb", "/Od", "/Iinclude", "/Fod:\\Code\\softrender\\trender\\build\\.objs\\trender\\windows\\x64\\debug\\src\\main.cpp.obj", "src\\main.cpp"],
   "file": "src\\main.cpp"
 },
 {
   "directory": "D:\\Code\\softrender\\trender",
-  "arguments": ["C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/Iinclude", "/DNDEBUG", "/Fobuild\\.objs\\trender\\windows\\x64\\release\\src\\tgaimage.cpp.obj", "src\\tgaimage.cpp"],
+  "arguments": ["C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdd:\\Code\\softrender\\trender\\build\\windows\\x64\\debug\\compile.trender.pdb", "/Od", "/Iinclude", "/Fod:\\Code\\softrender\\trender\\build\\.objs\\trender\\windows\\x64\\debug\\src\\model.cpp.obj", "src\\model.cpp"],
+  "file": "src\\model.cpp"
+},
+{
+  "directory": "D:\\Code\\softrender\\trender",
+  "arguments": ["C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdd:\\Code\\softrender\\trender\\build\\windows\\x64\\debug\\compile.trender.pdb", "/Od", "/Iinclude", "/Fod:\\Code\\softrender\\trender\\build\\.objs\\trender\\windows\\x64\\debug\\src\\our_gl.cpp.obj", "src\\our_gl.cpp"],
+  "file": "src\\our_gl.cpp"
+},
+{
+  "directory": "D:\\Code\\softrender\\trender",
+  "arguments": ["C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdd:\\Code\\softrender\\trender\\build\\windows\\x64\\debug\\compile.trender.pdb", "/Od", "/Iinclude", "/Fod:\\Code\\softrender\\trender\\build\\.objs\\trender\\windows\\x64\\debug\\src\\tgaimage.cpp.obj", "src\\tgaimage.cpp"],
   "file": "src\\tgaimage.cpp"
 }]

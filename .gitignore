@@ -8,6 +8,7 @@ build/
 objs/
 
 output.tga
+zbuffer.tga
 
 # MacOS Cache
 .DS_Store
