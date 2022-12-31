@@ -12,6 +12,9 @@ const int width = 800;
 const int height = 800;
 const int depth = 255;
 
+const vec3 eye(1, 1, 3);
+const vec3 center(0, 0, 0);
+
 // struct Ivec2 {
 //   Ivec2() = default;
 //   Ivec2(int x, int y) : x(x), y(y) {}
@@ -142,6 +145,21 @@ Matrix viewport(int x, int y, int w, int h) {
   return m;
 }
 
+Matrix look_at(Vec3f eye, Vec3f center, Vec3f up) {
+  Vec3f z = (eye - center).normalize();
+  vec3 x = (up ^ z).normalize();
+  vec3 y = (z ^ x).normalize();
+  Matrix rot = Matrix::identity(4);
+  Matrix trans = Matrix::identity(4);
+  for (int i = 0; i < 3; i++) {
+    rot[0][i] = x[i];
+    rot[1][i] = y[i];
+    rot[2][i] = z[i];
+    trans[i][3] = -eye[i];
+  }
+  return rot * trans;
+}
+
 int main(int argc, char **argv) {
 
   Model *model;
@@ -167,7 +185,6 @@ int main(int argc, char **argv) {
   //     }
   //   }
   float *zbuffer = new float[width * height];
-  Vec3f camera(0, 0, 3);
 
   std::fill(zbuffer, zbuffer + width * height,
             -std::numeric_limits<float>::max());
@@ -177,9 +194,9 @@ int main(int argc, char **argv) {
     Vec3f world_coords[3];
     Vec2f uvs[3];
     Matrix Projection = Matrix::identity(4);
-    Matrix ViewPort =
-        viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4);
-    Projection[3][2] = -1.f / camera.z;
+    Matrix ViewPort = viewport(0, 0, width, height);
+    Matrix ModelView = look_at(eye, center, Vec3f(0, 1, 0));
+    Projection[3][2] = -1.f / (eye - center).norm();
     for (int j = 0; j < 3; j++) {
       Vec3f world_coord = model->vert(i, j);
       world_coords[j] = world_coord;
@@ -188,7 +205,8 @@ int main(int argc, char **argv) {
       //       Vec3f((world_coord.x + 1.) * width / 2.,
       //             (world_coord.y + 1.) * height / 2., world_coord.z);
       auto s = ViewPort * Projection;
-      screen_coords[j] = m2v(ViewPort * Projection * v2m(world_coord));
+      screen_coords[j] =
+          m2v(ViewPort * Projection * ModelView * v2m(world_coord));
     }
     Vec3f normal = (world_coords[2] - world_coords[0]) ^
                    (world_coords[1] - world_coords[0]);
