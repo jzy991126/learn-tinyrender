@@ -246,6 +246,10 @@ Vec3f up(0, 1, 0);
 struct GouraudShader : public IShader {
   Vec3f varying_intensity; // written by vertex shader, read by fragment shader
   Vec3f world_pos_[3];
+  vec2 uvs[3];
+  vec3 ndc[3];
+  mat<3, 3, float> varing_nrm;
+
   mat<2, 3, float> varying_uv;
 
   Vec4f vertex(int iface, int nthvert, FragInfo &info) {
@@ -253,9 +257,16 @@ struct GouraudShader : public IShader {
         std::max(0.f, model->normal(iface, nthvert) *
                           light_dir); // get diffuse lighting intensity
     varying_uv.set_col(nthvert, model->uv(iface, nthvert));
+
+    varing_nrm.set_col(nthvert, model->normal(iface, nthvert));
+    uvs[nthvert] = model->uv(iface, nthvert);
     Vec4f gl_Vertex =
         embed<4>(model->vert(iface, nthvert)); // read the vertex from .obj file
     world_pos_[nthvert] = model->vert(iface, nthvert);
+    auto t_pos = Projection * ModelView * gl_Vertex;
+    // ndc[nthvert] =
+    //     vec3(t_pos[0] / t_pos[3], t_pos[1] / t_pos[3], t_pos[2] / t_pos[3]);
+    ndc[nthvert] = model->vert(iface, nthvert);
     return Viewport * Projection * ModelView *
            gl_Vertex; // transform it to screen coordinates
   }
@@ -264,6 +275,8 @@ struct GouraudShader : public IShader {
 
     float intensity =
         varying_intensity * bar; // interpolate intensity for the current pixel
+
+    vec3 bn = (varing_nrm * bar).normalize();
     float inten = 1.0;
     if (intensity > .85f) {
       inten = 1.f;
@@ -275,9 +288,45 @@ struct GouraudShader : public IShader {
       inten = 0.3;
     } else
       inten = 0.0f;
+    //--------------------------------------------
+    mat<2, 2, float> a;
+    vec2 uv1 = uvs[1] - uvs[0];
+    vec2 uv2 = uvs[2] - uvs[0];
 
+    a[0][0] = uv1.x;
+    a[0][1] = uv1.y;
+    a[1][0] = uv2.x;
+    a[1][1] = uv2.y;
+
+    auto ai = a.invert();
+    mat<2, 3, float> e;
+    e[0] = ndc[1] - ndc[0];
+    e[1] = ndc[2] - ndc[0];
+
+    mat<2, 3, float> t = ai * e;
+    vec3 t1 = t[0].normalize();
+    vec3 t2 = t[1].normalize();
+    vec3 norm = cross(t1, t2).normalize();
+
+    mat<3, 3, float> tbn;
+    tbn.set_col(0, t1);
+    tbn.set_col(1, t2);
+    tbn.set_col(2, bn);
+    //------------------------------------------------------
+
+    //----------------------------------------------------
+    // mat<3, 3, float> A;
+    // A[0] = ndc[1] - ndc[0];
+    // A[1] = ndc[2] - ndc[0];
+    // A[3] = bn;
+    // auto AI = A.invert();
+    // vec3 i = AI * vec3(uv1[0], uv2[0], 0);
+    // vec3 j = AI * vec3(uv1[1], uv2[1], 0);
+
+
+    //--------------------------------------------
     vec2 uv = varying_uv * bar;
-    vec3 normal = model->normal(uv).normalize();
+    vec3 normal = (tbn * (model->normal(uv))).normalize();
     vec3 r = ((normal * (light_dir * normal) * 2.f) - light_dir);
     intensity = std::max(0.f, normal * light_dir);
     float spec = pow(std::max(r.z, 0.0f), model->specular(uv));
@@ -294,7 +343,7 @@ int main(int argc, char **argv) {
   if (2 == argc) {
     model = new Model(argv[1]);
   } else {
-    model = new Model("obj/african_head/african_head.obj");
+    model = new Model("obj/boggie/body.obj");
   }
 
   lookat(eye, center, up);
