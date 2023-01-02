@@ -1,5 +1,6 @@
 
 
+#include <cmath>
 #include <iostream>
 #include <vector>
 
@@ -14,13 +15,31 @@ const int width = 800;
 const int height = 800;
 const int depth = 255;
 
+const float M_PI = acos(-1);
+
 TGAImage shadow_buffer(width, height, TGAImage::RGB);
 TGAImage use_buffer(width, height, TGAImage::RGB);
 
 Vec3f light_dir(1, 1, 1);
-Vec3f eye(0, 0, 3);
+Vec3f eye(1.2, -.8, 3);
 Vec3f center(0, 0, 0);
 Vec3f up(0, 1, 0);
+
+float max_elevation_angle(float *zbuffer, vec2 p, vec2 dir) {
+  float maxangle = 0;
+  for (float t = 0; t < 1000; t += 1.f) {
+    vec2 cur = p + dir * t;
+    if (cur.x >= width || cur.y >= height || cur.x < 0 || cur.y < 0)
+      return maxangle;
+    float distance = (p - cur).norm();
+    if (distance < 1.f)
+      continue;
+    float elevation = zbuffer[int(cur.x) + int(cur.y) * width] -
+                      zbuffer[int(p.x) + int(p.y) * width];
+    maxangle = std::max(maxangle, atanf(elevation / distance));
+  }
+  return maxangle;
+}
 
 struct DepthShader : public IShader {
   mat<3, 3, float> varing_tri;
@@ -146,15 +165,19 @@ int main(int argc, char **argv) {
   if (2 == argc) {
     model = new Model(argv[1]);
   } else {
-    model = new Model("obj/african_head/african_head.obj");
+    model = new Model("obj/diablo3_pose/diablo3_pose.obj");
   }
+  float *zbuffer = new float[width * height];
+  for (int i = width * height; i--;
+       zbuffer[i] = -std::numeric_limits<float>::max())
+    ;
   light_dir.normalize();
   {
 
     TGAImage depth(width, height, TGAImage::RGB);
-    lookat(light_dir, center, up);
+    lookat(eye, center, up);
     viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4);
-    projection(0);
+    projection(-1.f / (eye - center).norm());
 
     DepthShader depthshader;
     Vec4f screen_coords[3];
@@ -163,15 +186,11 @@ int main(int argc, char **argv) {
       for (int j = 0; j < 3; j++) {
         screen_coords[j] = depthshader.vertex(i, j, info);
       }
-      triangle(screen_coords, depthshader, use_buffer, shadow_buffer);
+      triangle(screen_coords, depthshader, use_buffer, zbuffer);
     }
     // use_buffer.flip_vertically(); // to place the origin in the bottom left
     //  corner of the image
     use_buffer.write_tga_file("use.tga");
-
-    shadow_buffer.flip_horizontally();
-
-    shadow_buffer.write_tga_file("shadow.tga");
   }
 
   Matrix M = Viewport * Projection * ModelView;
@@ -180,25 +199,38 @@ int main(int argc, char **argv) {
   projection(-1.f / (eye - center).norm());
 
   TGAImage image(width, height, TGAImage::RGB);
-  TGAImage zbuffer(width, height, TGAImage::GRAYSCALE);
 
-  GouraudShader shader;
-  shader.shadow_mat = M * (Viewport * Projection * ModelView).invert();
-  for (int i = 0; i < model->nfaces(); i++) {
-    Vec4f screen_coords[3];
-    FragInfo info;
-    for (int j = 0; j < 3; j++) {
-      screen_coords[j] = shader.vertex(i, j, info);
+  // GouraudShader shader;
+  // shader.shadow_mat = M * (Viewport * Projection * ModelView).invert();
+  // for (int i = 0; i < model->nfaces(); i++) {
+  //   Vec4f screen_coords[3];
+  //   FragInfo info;
+  //   for (int j = 0; j < 3; j++) {
+  //     screen_coords[j] = shader.vertex(i, j, info);
+  //   }
+  //   triangle(screen_coords, shader, image, zbuffer);
+  // }
+
+  for (int x = 0; x < width; x++) {
+    for (int y = 0; y < height; y++) {
+      if (zbuffer[x + y * width] < -1e5)
+        continue;
+      float total = 0;
+      for (float a = 0; a < M_PI * 2 - 1e-4; a += M_PI / 4) {
+        total += M_PI / 2 - max_elevation_angle(zbuffer, Vec2f(x, y),
+                                                Vec2f(cos(a), sin(a)));
+      }
+      total /= (M_PI / 2) * 8;
+      total = pow(total, 100.f);
+      image.set(x, y, TGAColor(total * 255, total * 255, total * 255));
     }
-    triangle(screen_coords, shader, image, zbuffer);
   }
-
   image.flip_vertically(); // to place the origin in the bottom left corner
   // of
   //  the image
-  zbuffer.flip_vertically();
+  // zbuffer.flip_vertically();
   image.write_tga_file("output.tga");
-  zbuffer.write_tga_file("zbuffer.tga");
+  // zbuffer.write_tga_file("zbuffer.tga");
 
   delete model;
   return 0;

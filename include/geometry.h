@@ -5,7 +5,6 @@
 #include <iostream>
 #include <vector>
 
-
 template <size_t DimCols, size_t DimRows, typename T> class mat;
 
 template <size_t DIM, typename T> struct vec {
@@ -40,6 +39,7 @@ template <typename T> struct vec<2, T> {
     assert(i < 2);
     return i <= 0 ? x : y;
   }
+  float norm() { return std::sqrt(x * x + y * y); }
 
   T x, y;
 };
